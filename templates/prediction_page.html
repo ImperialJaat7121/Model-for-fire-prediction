@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FWI Prediction | ML Model</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            background: linear-gradient(120deg, #232526, #414345, #6dd5fa 90%);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            height: 100%;
+            overflow-y: auto;
+        }
+        .app-window {
+            background: rgba(34, 40, 49, 0.97);
+            max-width: 540px;
+            margin: 60px auto;
+            padding: 0;
+            border-radius: 14px;
+            box-shadow: 0 16px 48px 0 rgba(31, 38, 135, 0.25), 0 1.5px 0 #222831;
+            animation: popIn 0.8s cubic-bezier(.68,-0.55,.27,1.55);
+            border: 2px solid #393e46;
+            overflow: hidden;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.85) translateY(40px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .window-bar {
+            background: linear-gradient(90deg, #232526 60%, #393e46 100%);
+            height: 38px;
+            border-radius: 14px 14px 0 0;
+            display: flex;
+            align-items: center;
+            padding: 0 18px;
+            position: relative;
+            box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.07);
+            border-bottom: 1.5px solid #393e46;
+        }
+        .window-controls {
+            display: flex;
+            gap: 7px;
+        }
+        .window-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1.5px solid #232526;
+        }
+        .window-dot.red { background: #e06c75; }
+        .window-dot.yellow { background: #e5c07b; }
+        .window-dot.green { background: #98c379; }
+        .window-title {
+            flex: 1;
+            text-align: center;
+            color: #abb2bf;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1px;
+            user-select: none;
+            font-family: 'Roboto Mono', monospace;
+        }
+        .login {
+            padding: 44px 40px 36px 40px;
+        }
+        h1 {
+            text-align: center;
+            color: #61afef;
+            margin-bottom: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-size: 2.1rem;
+            animation: fadeInDown 0.7s;
+            font-family: 'Roboto Mono', monospace;
+        }
+        @keyframes fadeInDown {
+            0% { opacity: 0; transform: translateY(-30px);}
+            100% { opacity: 1; transform: translateY(0);}
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            animation: fadeInUp 0.8s;
+        }
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(30px);}
+            100% { opacity: 1; transform: translateY(0);}
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        label {
+            font-size: 15px;
+            color: #abb2bf;
+            font-weight: 500;
+            margin-bottom: 2px;
+            font-family: 'Roboto Mono', monospace;
+        }
+        input[type="text"] {
+            padding: 10px 12px;
+            border: 1.5px solid #393e46;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.2s, box-shadow 0.2s;
+            background: #232526;
+            color: #d7dae0;
+            box-shadow: 0 1px 2px 0 rgba(41,128,185,0.04);
+            font-family: 'Roboto Mono', monospace;
+        }
+        input[type="text"]:focus {
+            border: 1.5px solid #61afef;
+            outline: none;
+            box-shadow: 0 0 0 2px #61afef55;
+        }
+        .btn {
+            background: linear-gradient(90deg, #232526 60%, #61afef 100%);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 14px;
+            transition: background 0.2s, transform 0.15s;
+            box-shadow: 0 2px 8px 0 rgba(41,128,185,0.09);
+            letter-spacing: 0.5px;
+            font-family: 'Roboto Mono', monospace;
+        }
+        .btn:hover {
+            background: linear-gradient(90deg, #393e46 60%, #4ec6f8 100%);
+            transform: translateY(-2px) scale(1.03);
+        }
+        h2 {
+            text-align: center;
+            color: #98c379;
+            margin-top: 32px;
+            font-weight: 500;
+            font-size: 22px;
+            letter-spacing: 0.5px;
+            animation: fadeInResult 1s;
+            font-family: 'Roboto Mono', monospace;
+        }
+        @keyframes fadeInResult {
+            0% { opacity: 0; transform: scale(0.95);}
+            100% { opacity: 1; transform: scale(1);}
+        }
+        /* Scrollbar styling for desktop feel */
+        ::-webkit-scrollbar {
+            width: 10px;
+            background: #232526;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #393e46;
+            border-radius: 6px;
+        }
+        /* Responsive */
+        @media (max-width: 600px) {
+            .app-window {
+                max-width: 98vw;
+                margin: 18px;
+            }
+            .login {
+                padding: 24px 8vw;
+            }
+        }
+        /* Floating animated background shapes */
+        .bg-shape {
+            position: fixed;
+            z-index: 0;
+            opacity: 0.10;
+            pointer-events: none;
+            border-radius: 50%;
+            filter: blur(2px);
+            animation: floatShape 14s infinite alternate ease-in-out;
+        }
+        .bg-shape.one {
+            width: 220px; height: 220px;
+            background: #61afef;
+            left: -60px; top: 80px;
+            animation-delay: 0s;
+        }
+        .bg-shape.two {
+            width: 160px; height: 160px;
+            background: #232526;
+            right: -50px; top: 40vh;
+            animation-delay: 2s;
+        }
+        .bg-shape.three {
+            width: 120px; height: 120px;
+            background: #98c379;
+            left: 30vw; bottom: -60px;
+            animation-delay: 4s;
+        }
+        @keyframes floatShape {
+            0% { transform: translateY(0) scale(1);}
+            100% { transform: translateY(-40px) scale(1.08);}
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-shape one"></div>
+    <div class="bg-shape two"></div>
+    <div class="bg-shape three"></div>
+    <div class="app-window">
+        <div class="window-bar">
+            <div class="window-controls">
+                <span class="window-dot red"></span>
+                <span class="window-dot yellow"></span>
+                <span class="window-dot green"></span>
+            </div>
+            <span class="window-title">FWI Prediction App</span>
+        </div>
+        <div class="login">
+            <h1>FWI Prediction</h1>
+            <form action="{{ url_for('predict_datapoint')}}" method="post" autocomplete="off">
+                <div class="form-group">
+                    <label for="Temperature">Temperature</label>
+                    <input type="text" id="Temperature" name="Temperature" placeholder="Temperature" required>
+                </div>
+                <div class="form-group">
+                    <label for="RH">Relative Humidity (RH)</label>
+                    <input type="text" id="RH" name="RH" placeholder="RH" required>
+                </div>
+                <div class="form-group">
+                    <label for="Ws">Wind Speed (Ws)</label>
+                    <input type="text" id="Ws" name="Ws" placeholder="Ws" required>
+                </div>
+                <div class="form-group">
+                    <label for="Rain">Rain</label>
+                    <input type="text" id="Rain" name="Rain" placeholder="Rain" required>
+                </div>
+                <div class="form-group">
+                    <label for="FFMC">FFMC</label>
+                    <input type="text" id="FFMC" name="FFMC" placeholder="FFMC" required>
+                </div>
+                <div class="form-group">
+                    <label for="DMC">DMC</label>
+                    <input type="text" id="DMC" name="DMC" placeholder="DMC" required>
+                </div>
+                <div class="form-group">
+                    <label for="ISI">ISI</label>
+                    <input type="text" id="ISI" name="ISI" placeholder="ISI" required>
+                </div>
+                <div class="form-group">
+                    <label for="Classes">Classes</label>
+                    <input type="text" id="Classes" name="Classes" placeholder="Classes" required>
+                </div>
+                <div class="form-group">
+                    <label for="Region">Region</label>
+                    <input type="text" id="Region" name="Region" placeholder="Region" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-large">Predict</button>
+            </form>
+            <h2>
+                THE FWI PREDICTION IS {{prediction}}
+            </h2>
+        </div>
+    </div>
+</body>
+</html>
